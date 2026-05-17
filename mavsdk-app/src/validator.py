@@ -6,17 +6,14 @@ Checks no-go zones, flight path, IFF, impossible actions, and state feasibility.
 
 import json
 import os
+import sys
 from dataclasses import dataclass, field
 
-import sys
+from pathfinder import path_clear_2d, plan_path, segment_intersects_circle, ThreatZone, zones_from_config
+
+# challenge package lives at the project root (two levels up from this file)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-from challenge.config import (
-    NO_GO_ZONES, WAYPOINTS, WAYPOINTS_BY_NAME, distance_2d,
-)
-from pathfinder import (
-    ThreatZone, zones_from_config, plan_path,
-    path_clear_2d, segment_intersects_circle,
-)
+from challenge.config import distance_2d, NO_GO_ZONES
 
 # Build threat model once from config
 _THREATS: list[ThreatZone] = zones_from_config(NO_GO_ZONES)

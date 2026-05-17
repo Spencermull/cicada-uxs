@@ -5,17 +5,17 @@ background telemetry streaming and non-blocking command execution.
 """
 
 import math
+import os
+import sys
 import threading
 import time
 from dataclasses import dataclass, field
 
 from pymavlink import mavutil
 
-import sys, os
+# challenge package lives at the project root (two levels up from this file)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-from challenge.config import (
-    PYMAVLINK_CONNECTION, latlon_to_local, local_to_latlon, distance_2d,
-)
+from challenge.config import distance_2d, latlon_to_local, local_to_latlon, PYMAVLINK_CONNECTION
 
 # SITL HOME is at compound center (0, 0) per launch_sitl.sh -l flag.
 # LOCAL_NED origin = compound center, so ENU coords map directly to NED.
