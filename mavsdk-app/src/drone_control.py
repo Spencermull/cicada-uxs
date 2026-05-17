@@ -8,7 +8,6 @@ import math
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 
 from pymavlink import mavutil
 
@@ -39,7 +38,7 @@ class DroneController:
         self.sysid = sysid  # MAVLink system ID — used to filter the right SITL on multicast
         self.mav = None
         self._lock = threading.Lock()
-        self._telem_thread: Optional[threading.Thread] = None
+        self._telem_thread: threading.Thread | None = None
         self._running = False
 
         # Current state (updated by telemetry thread)
@@ -316,7 +315,7 @@ class DroneController:
         )
 
     def goto_relative(self, direction: str, distance: float,
-                      altitude: Optional[float] = None) -> CommandResult:
+                      altitude: float | None = None) -> CommandResult:
         """Fly a relative direction/distance from current position."""
         pos = self.get_position()
         cur_x, cur_y = pos["x"], pos["y"]

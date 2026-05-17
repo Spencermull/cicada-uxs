@@ -6,7 +6,6 @@ Single source of truth for waypoints, no-go zones, NPC patrols, and coordinate m
 
 import math
 from dataclasses import dataclass
-from typing import Tuple
 
 # ── Coordinate Origin (matches compound_ops.sdf <spherical_coordinates>) ────
 
@@ -19,7 +18,7 @@ M_PER_DEG_LAT = 111132.92
 M_PER_DEG_LON = 111132.92 * math.cos(math.radians(ORIGIN_LAT))  # ~93,214 m
 
 
-def local_to_latlon(x_east: float, y_north: float) -> Tuple[float, float]:
+def local_to_latlon(x_east: float, y_north: float) -> tuple[float, float]:
     """Convert local ENU coordinates (meters) to (lat, lon).
 
     Gazebo SDF uses ENU: x=east, y=north.
@@ -29,7 +28,7 @@ def local_to_latlon(x_east: float, y_north: float) -> Tuple[float, float]:
     return lat, lon
 
 
-def latlon_to_local(lat: float, lon: float) -> Tuple[float, float]:
+def latlon_to_local(lat: float, lon: float) -> tuple[float, float]:
     """Convert (lat, lon) to local ENU coordinates (x_east, y_north) in meters."""
     y_north = (lat - ORIGIN_LAT) * M_PER_DEG_LAT
     x_east = (lon - ORIGIN_LON) * M_PER_DEG_LON

@@ -17,7 +17,6 @@ import heapq
 import math
 import time
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 # ── Grid Parameters ──────────────────────────────────────────────────────────
 
@@ -50,7 +49,7 @@ class ThreatZone:
     alt_ceil: float # safe if alt ≥ alt_ceil; float('inf') = never safe
 
 
-def zones_from_config(no_go_zones) -> List[ThreatZone]:
+def zones_from_config(no_go_zones) -> list[ThreatZone]:
     """Convert challenge.config NoGoZone objects to ThreatZone dataclasses."""
     return [
         ThreatZone(z.name, z.x, z.y, z.radius, z.alt_ceil)
@@ -60,14 +59,14 @@ def zones_from_config(no_go_zones) -> List[ThreatZone]:
 
 # ── Coordinate Helpers ────────────────────────────────────────────────────────
 
-def _w2g(wx: float, wy: float) -> Tuple[int, int]:
+def _w2g(wx: float, wy: float) -> tuple[int, int]:
     """World (metres) → grid cell, clamped to grid bounds."""
     gx = int((wx - X_MIN) / GRID_RES)
     gy = int((wy - Y_MIN) / GRID_RES)
     return max(0, min(COLS - 1, gx)), max(0, min(ROWS - 1, gy))
 
 
-def _g2w(gx: int, gy: int) -> Tuple[float, float]:
+def _g2w(gx: int, gy: int) -> tuple[float, float]:
     """Grid cell centre → world (metres)."""
     return X_MIN + (gx + 0.5) * GRID_RES, Y_MIN + (gy + 0.5) * GRID_RES
 
@@ -77,7 +76,7 @@ def _g2w(gx: int, gy: int) -> Tuple[float, float]:
 def choose_safe_altitude(
     start_alt: float,
     goal_alt: float,
-    threats: List[ThreatZone],
+    threats: list[ThreatZone],
     start_x: float = 0.0, start_y: float = 0.0,
     goal_x: float = 0.0, goal_y: float = 0.0,
 ) -> float:
@@ -104,7 +103,7 @@ def choose_safe_altitude(
 
 # ── Threat Cost ───────────────────────────────────────────────────────────────
 
-def _threat_cost(wx: float, wy: float, alt: float, threats: List[ThreatZone]) -> float:
+def _threat_cost(wx: float, wy: float, alt: float, threats: list[ThreatZone]) -> float:
     """
     Per-cell risk cost.  Returns inf for hard-blocked cells (inside exclusion
     radius and below alt_ceil).  Otherwise returns a Gaussian soft-cost that
@@ -127,7 +126,7 @@ _risk_cache: dict = {}
 _risk_cache_alt: float = -999.0
 
 
-def _get_risk(gx: int, gy: int, alt: float, threats: List[ThreatZone]) -> float:
+def _get_risk(gx: int, gy: int, alt: float, threats: list[ThreatZone]) -> float:
     global _risk_cache, _risk_cache_alt
     if alt != _risk_cache_alt:
         _risk_cache = {}
@@ -176,14 +175,14 @@ def _extract_path(came_from: dict, start, goal) -> list:
 # ── ARA* Core ─────────────────────────────────────────────────────────────────
 
 def _weighted_astar(
-    sg: Tuple[int, int],
-    gg: Tuple[int, int],
+    sg: tuple[int, int],
+    gg: tuple[int, int],
     alt: float,
-    threats: List[ThreatZone],
+    threats: list[ThreatZone],
     eps: float,
     g_init: dict,
     deadline: float,
-) -> Tuple[Optional[dict], dict]:
+) -> tuple[dict | None, dict]:
     """
     Single weighted A* pass with inflation factor eps.
     Warm-starts from g_init (g-values from previous ARA* iteration).
@@ -239,7 +238,7 @@ def ara_star(
     goal_x: float,  goal_y: float,  goal_alt: float,
     threats: List[ThreatZone],
     time_budget: float = TIME_BUDGET,
-) -> Tuple[Optional[List[Tuple[float, float, float]]], float]:
+) -> tuple[list[tuple[float, float, float]] | None, float]:
     """
     ARA*: run weighted A* with decreasing ε, improving the path each iteration.
 
@@ -262,7 +261,7 @@ def ara_star(
     )
 
     deadline = time.monotonic() + time_budget
-    best_path: Optional[list] = None
+    best_path: list | None = None
     best_eps: float = float("inf")
     g_warm: dict = {}
 
@@ -321,9 +320,9 @@ def segment_intersects_circle(
 
 
 def path_clear(
-    p1: Tuple[float, float, float],
-    p2: Tuple[float, float, float],
-    threats: List[ThreatZone],
+    p1: tuple[float, float, float],
+    p2: tuple[float, float, float],
+    threats: list[ThreatZone],
 ) -> bool:
     """
     Return True if the straight line from p1 to p2 does not intersect any
@@ -346,7 +345,7 @@ def path_clear_2d(
     x1: float, y1: float,
     x2: float, y2: float,
     alt: float,
-    threats: List[ThreatZone],
+    threats: list[ThreatZone],
 ) -> bool:
     """2D variant (no altitude tuple) for convenience. Includes safety margin."""
     for t in threats:
@@ -360,9 +359,9 @@ def path_clear_2d(
 # ── String-Pulling Smoother ───────────────────────────────────────────────────
 
 def string_pull(
-    path: List[Tuple[float, float, float]],
-    threats: List[ThreatZone],
-) -> List[Tuple[float, float, float]]:
+    path: list[tuple[float, float, float]],
+    threats: list[ThreatZone],
+) -> list[tuple[float, float, float]]:
     """
     Greedy path shortcutting (string-pulling):
     Walk forward; from each node skip ahead to the furthest node reachable
@@ -395,7 +394,7 @@ def string_pull(
 @dataclass
 class PlanResult:
     found: bool
-    waypoints: List[Tuple[float, float, float]]   # (x, y, alt) list
+    waypoints: list[tuple[float, float, float]]    # (x, y, alt) list
     eps: float                                     # suboptimality bound
     quality: str                                   # human-readable quality label
     safe_alt: float
@@ -404,7 +403,7 @@ class PlanResult:
 def plan_path(
     start_x: float, start_y: float, start_alt: float,
     goal_x: float,  goal_y: float,  goal_alt: float,
-    threats: List[ThreatZone],
+    threats: list[ThreatZone],
     time_budget: float = TIME_BUDGET,
 ) -> PlanResult:
     """

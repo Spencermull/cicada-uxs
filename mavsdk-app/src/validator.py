@@ -7,7 +7,6 @@ Checks no-go zones, flight path, IFF, impossible actions, and state feasibility.
 import json
 import os
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
 
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
@@ -20,7 +19,7 @@ from pathfinder import (
 )
 
 # Build threat model once from config
-_THREATS: List[ThreatZone] = zones_from_config(NO_GO_ZONES)
+_THREATS: list[ThreatZone] = zones_from_config(NO_GO_ZONES)
 
 
 @dataclass
@@ -30,7 +29,7 @@ class ValidationResult:
     suggestion: str
     # Populated when ARA* reroutes around a blocked direct path.
     # Each tuple is (x, y, alt) in ENU metres.
-    waypoints: List[Tuple[float, float, float]] = field(default_factory=list)
+    waypoints: list[tuple[float, float, float]] = field(default_factory=list)
     path_quality: str = ""   # e.g. "≤2.0× optimal (time-bounded)"
 
 
@@ -98,7 +97,7 @@ LOCATIONS = {
 }
 
 
-def resolve_location(name: str) -> Optional[LocationInfo]:
+def resolve_location(name: str) -> LocationInfo | None:
     """Resolve a natural-language location name to coordinates."""
     key = name.lower().strip()
     if key in LOCATIONS:
@@ -119,7 +118,7 @@ if os.path.exists(_iff_path):
         IFF_CONTACTS = json.load(f).get("contacts", [])
 
 
-def check_iff(target_name: str) -> Optional[dict]:
+def check_iff(target_name: str) -> dict | None:
     """Look up an entity in the IFF list. Returns contact dict or None."""
     for contact in IFF_CONTACTS:
         if contact["callsign"].lower() == target_name.lower():
