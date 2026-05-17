@@ -10,6 +10,8 @@ import re
 
 from dotenv import load_dotenv
 
+from drone_control import DIRECTION_MAP
+
 # Load .env from this directory (mavsdk-app/src/.env)
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
@@ -190,8 +192,6 @@ def _fallback_parse_single(text: str) -> dict:
         return {"action": "takeoff", "altitude": alt or 10}
 
     # Land
-    if t.strip() in ("land", "land now", "land the drone"):
-        return {"action": "land"}
     if t.startswith("land"):
         return {"action": "land"}
 
@@ -212,8 +212,7 @@ def _fallback_parse_single(text: str) -> dict:
         return {"action": "change_altitude", "altitude": float(alt_only.group(1))}
 
     # Relative movement: "fly north 50 meters"
-    directions = ["north", "south", "east", "west", "northeast", "northwest", "southeast", "southwest"]
-    for d in directions:
+    for d in DIRECTION_MAP:
         pattern = rf'(?:fly|go|move|head)\s+{d}\s+(\d+(?:\.\d+)?)\s*(?:meters?|m)?'
         match = re.search(pattern, t)
         if match:
