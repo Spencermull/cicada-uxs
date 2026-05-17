@@ -20,6 +20,18 @@ from challenge.config import distance_2d, latlon_to_local, local_to_latlon, PYMA
 # SITL HOME is at compound center (0, 0) per launch_sitl.sh -l flag.
 # LOCAL_NED origin = compound center, so ENU coords map directly to NED.
 
+# Unit vectors for each compass direction in ENU (east, north).
+DIRECTION_MAP: dict[str, tuple[float, float]] = {
+    "north":     ( 0,     1    ),
+    "south":     ( 0,    -1    ),
+    "east":      ( 1,     0    ),
+    "west":      (-1,     0    ),
+    "northeast": ( 0.707,  0.707),
+    "northwest": (-0.707,  0.707),
+    "southeast": ( 0.707, -0.707),
+    "southwest": (-0.707, -0.707),
+}
+
 
 @dataclass
 class CommandResult:
@@ -313,25 +325,6 @@ class DroneController:
             f"Completed {len(waypoints)}-waypoint route",
             "waypoints"
         )
-
-    def goto_relative(self, direction: str, distance: float,
-                      altitude: float | None = None) -> CommandResult:
-        """Fly a relative direction/distance from current position."""
-        pos = self.get_position()
-        cur_x, cur_y = pos["x"], pos["y"]
-        alt = altitude if altitude is not None else pos["alt"]
-
-        direction_map = {
-            "north": (0, 1), "south": (0, -1),
-            "east": (1, 0), "west": (-1, 0),
-            "northeast": (0.707, 0.707), "northwest": (-0.707, 0.707),
-            "southeast": (0.707, -0.707), "southwest": (-0.707, -0.707),
-        }
-        dx, dy = direction_map.get(direction.lower(), (0, 0))
-        target_x = cur_x + dx * distance
-        target_y = cur_y + dy * distance
-
-        return self.goto_location(target_x, target_y, alt)
 
     def change_altitude(self, new_alt: float) -> CommandResult:
         """Change altitude while maintaining current horizontal position."""

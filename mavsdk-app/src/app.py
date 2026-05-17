@@ -22,7 +22,7 @@ sys.path.insert(0, _project_root)
 
 from voice_input import listen_and_transcribe
 
-from drone_control import CommandResult, DroneController
+from drone_control import CommandResult, DIRECTION_MAP, DroneController
 from intent_parser import parse_command
 from validator import resolve_location, validate
 from voice_io import VoiceFeedback
@@ -62,14 +62,6 @@ def _cancel_active_queue():
 
 # ── Single-Intent Processing ─────────────────────────────────────────────
 
-_DIRECTION_MAP = {
-    "north": (0, 1), "south": (0, -1),
-    "east": (1, 0), "west": (-1, 0),
-    "northeast": (0.707, 0.707), "northwest": (-0.707, 0.707),
-    "southeast": (0.707, -0.707), "southwest": (-0.707, -0.707),
-}
-
-
 def _process_single_intent(intent: dict, ctrl: DroneController,
                            wait_for_move: bool = False) -> dict:
     """Run one intent through resolve → validate → execute.
@@ -103,7 +95,7 @@ def _process_single_intent(intent: dict, ctrl: DroneController,
     if action == "move_relative":
         pos = ctrl.get_position()
         d = intent.get("direction", "north").lower()
-        dx, dy = _DIRECTION_MAP.get(d, (0, 0))
+        dx, dy = DIRECTION_MAP.get(d, (0, 0))
         dist = intent.get("distance", 0)
         intent["x"] = pos["x"] + dx * dist
         intent["y"] = pos["y"] + dy * dist
