@@ -7,7 +7,7 @@
 
 
 
-class UDPOPEN  // UDP socket opener class
+class UdpSocket  // UDP socket opener class
 {
     private:
     SOCKET sock;
@@ -17,12 +17,9 @@ class UDPOPEN  // UDP socket opener class
     mavlink_status_t status;
     WSADATA wsaData;
 public:
-    UDPOPEN(){   
-        WSAStartup(  // init winsock
-           MAKEWORD(2, 2), &wsaData     
-        );
-
-         int result = WSAStartup(MAKEWORD(2,2), &wsaData); // check if process is up
+    UdpSocket(){   
+    
+        int result = WSAStartup(MAKEWORD(2,2), &wsaData); // check if process is up
         if(result != 0){
             throw std::runtime_error("WSAStartup Failed");
         }
@@ -36,7 +33,7 @@ public:
 
     void receive() const{};
 
-    ~UDPOPEN(){
+    ~UdpSocket(){
 
     }
     
