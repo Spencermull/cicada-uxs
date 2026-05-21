@@ -1,0 +1,6 @@
+[submodule "cicada/third_party/mavlink"]
+	path = cicada/third_party/mavlink
+	url = https://github.com/mavlink/c_library_v2.git
+[submodule "cicada/third_party/cppzmq"]
+	path = cicada/third_party/cppzmq
+	url = https://github.com/zeromq/cppzmq.git
