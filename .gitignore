@@ -8,18 +8,20 @@ venv/
 cicada/third_party/json.hpp
 
 # C++ build output
-cicada/build/
-cicada/**/*.o
-cicada/**/*.obj
-cicada/**/*.exe
-cicada/**/*.dll
-cicada/**/*.so
-cicada/**/*.a
-cicada/**/*.lib
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-compile_commands.json
+build/
+**/build/
+**/*.o
+**/*.obj
+**/*.exe
+**/*.dll
+**/*.so
+**/*.a
+**/*.lib
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/compile_commands.json
+**/.cmake/
 AGENTS.md
 CLAUDE.md
 terrain/
@@ -180,5 +182,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
-
+/.vscode
 /diagrams
