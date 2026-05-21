@@ -3,7 +3,7 @@
 #include <winsock2.h> // windows specific networking libs
 #include <ws2tcpip.h>
 #include <stdexcept>
-#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib") // TODO migrate to fit with gcc toolchain
 
 
 
@@ -12,7 +12,7 @@ class UdpSocket  // UDP socket opener class
     private:
     SOCKET sock;
     sockaddr_in localAddr;
-    uint8_t buffer[512];
+    uint8_t buffer[2048]; // update to fit mavsdk frame output
     mavlink_message_t msg;
     mavlink_status_t status;
     WSADATA wsaData;
@@ -31,10 +31,13 @@ public:
     }
     
 
-    void receive() const{};
-
+    void receive() {
+        
+    };
+     // destruct socket 
     ~UdpSocket(){
-
+        WSACleanup();
+        closesocket(sock);
     }
     
 };
