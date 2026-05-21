@@ -36,8 +36,9 @@ public:
     };
      // destruct socket 
     ~UdpSocket(){
-        WSACleanup();
         closesocket(sock);
+        WSACleanup();
+       
     }
     
 };
