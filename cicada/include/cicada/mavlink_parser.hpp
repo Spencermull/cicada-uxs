@@ -22,7 +22,7 @@ public:
             throw std::runtime_error("WSAStartup Failed");
         }
 
-        sock = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); // define the win socket for udp
+        sock = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); // define the win socket for udp (IPv4)
         if (sock == INVALID_SOCKET)
         {
             throw std::runtime_error("socket failed");
@@ -36,8 +36,15 @@ public:
         };
     }
 
-    int receive(uint8_t *buffer, int bufferSize) {}; // recieves raw bytes
-    // TODO: receive implementation
+    int receive(uint8_t *buffer, int bufferSize) // recieves raw bytes
+    {                                                                                
+        int bytes = recvfrom(sock, (char *)buffer, bufferSize, 0, nullptr, nullptr); // uses nullptr as we assume all packets come from the SITL
+        if (bytes == SOCKET_ERROR)
+        {
+            throw std::runtime_error("recvfrom failed");
+        }
+        return bytes; // returns raw bytes from SITL traffic
+    };
 
     // destruct socket
     ~UdpSocket()
