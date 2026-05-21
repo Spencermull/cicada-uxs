@@ -37,7 +37,7 @@ public:
     }
 
     int receive(uint8_t *buffer, int bufferSize) // recieves raw bytes
-    {                                                                                
+    {
         int bytes = recvfrom(sock, (char *)buffer, bufferSize, 0, nullptr, nullptr); // uses nullptr as we assume all packets come from the SITL
         if (bytes == SOCKET_ERROR)
         {
@@ -59,6 +59,26 @@ class MavLinkParser
     mavlink_message_t msg;
     mavlink_status_t status;
     uint8_t buffer[2048]; // update to fit mavsdk frame output
+    UdpSocket &socket;
 public:
-    // TODO: Parser constructor and parse method
+    
+    MavLinkParser(UdpSocket &sock) : socket(sock)
+    {}
+    void parse()
+    {
+        int len = socket.receive(buffer,sizeof(buffer));
+        for(int i = 0; i < len; i++){
+         int comm = mavlink_parse_char(MAVLINK_COMM_0 ,buffer[i], &msg, &status); 
+            if(comm == 1){
+                if(msg.msgid == MAVLINK_MSG_ID_GLOBAL_POSITION_INT){
+                    mavlink_global_position_int_t pos;
+                    mavlink_msg_global_position_int_decode(&msg, &pos);
+                        // pos.lat, pos.lon, pos.alt, pos.relative_alt, pos.hdg
+                        //TODO: fill remaining message types
+                }
+            }
+        }
+
+       
+    }
 };
